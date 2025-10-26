@@ -1,20 +1,26 @@
 import javax.swing.SwingUtilities;
 
-// Stage 1: The Entry Point
-// This class's only job is to start our application.
+// Stage 2: The Entry Point (Updated)
+// Humara main class ab DatabaseManager ko bhi initialize karega.
 public class Main {
 
     public static void main(String[] args) {
-        // Swing applications should run on a special "Event Dispatch Thread" (EDT).
-        // SwingUtilities.invokeLater() makes sure it does.
+
+        // 1. Initialize the Database Manager first
+        // Yeh connection banayega aur table create karega app start hote hi.
+        DatabaseManager dbManager = new DatabaseManager();
+
+        // 2. Run the GUI
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 // Create an instance of our form
-                RegistrationForm form = new RegistrationForm();
+                // Aur ab hum form ko dbManager ka reference denge
+                RegistrationForm form = new RegistrationForm(dbManager);
                 // Make the form visible
                 form.setVisible(true);
             }
         });
     }
 }
+

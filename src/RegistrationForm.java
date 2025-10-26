@@ -3,30 +3,35 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-// Stage 1: The View (GUI)
-// This class creates the main window for our application.
+// Stage 1: The View (GUI) - Updated for Stage 2
 public class RegistrationForm extends JFrame {
 
-    // 1. Declare all the GUI components (labels, text fields, buttons)
     private JLabel titleLabel, nameLabel, idLabel, emailLabel, phoneLabel;
     private JTextField nameField, idField, emailField, phoneField;
     private JButton submitButton;
-    private JPanel panel; // A panel to hold all the components
+    private JPanel panel;
 
-    public RegistrationForm() {
+    // --- STAGE 2 UPDATE ---
+    // DatabaseManager ke liye ek reference variable
+    private DatabaseManager dbManager;
+
+    // --- STAGE 2 UPDATE ---
+    // Constructor ko update kiya taaki woh DatabaseManager ko receive kar sake
+    public RegistrationForm(DatabaseManager dbManager) {
+        this.dbManager = dbManager; // Store the reference
+
         // --- Basic Window Setup ---
         setTitle("Student Registration Form");
-        setSize(500, 400); // Set window size (width, height)
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Close app when 'X' is clicked
-        setLocationRelativeTo(null); // Center the window on the screen
+        setSize(500, 400);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
 
         // --- Create the Panel and Layout Manager ---
-        // We'll use GridBagLayout for a clean, aligned form.
         panel = new JPanel(new GridBagLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // Add padding
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL; // Make components fill horizontal space
-        gbc.insets = new Insets(5, 5, 5, 5); // Add spacing between components
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         // --- 2. Initialize all components ---
 
@@ -35,13 +40,13 @@ public class RegistrationForm extends JFrame {
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         gbc.gridx = 0;
         gbc.gridy = 0;
-        gbc.gridwidth = 2; // Span across two columns
-        gbc.anchor = GridBagConstraints.CENTER; // Center the title
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
         panel.add(titleLabel, gbc);
 
-        // Reset constraints for other components
+        // Reset constraints
         gbc.gridwidth = 1;
-        gbc.anchor = GridBagConstraints.LINE_START; // Align components to the left
+        gbc.anchor = GridBagConstraints.LINE_START;
 
         // Name Row
         nameLabel = new JLabel("Full Name:");
@@ -49,7 +54,7 @@ public class RegistrationForm extends JFrame {
         gbc.gridy = 1;
         panel.add(nameLabel, gbc);
 
-        nameField = new JTextField(20); // 20 is the preferred width
+        nameField = new JTextField(20);
         gbc.gridx = 1;
         gbc.gridy = 1;
         panel.add(nameField, gbc);
@@ -91,25 +96,24 @@ public class RegistrationForm extends JFrame {
         submitButton = new JButton("Submit");
         gbc.gridx = 0;
         gbc.gridy = 5;
-        gbc.gridwidth = 2; // Span both columns
-        gbc.anchor = GridBagConstraints.CENTER; // Center the button
+        gbc.gridwidth = 2;
+        gbc.anchor = GridBagConstraints.CENTER;
         panel.add(submitButton, gbc);
 
         // --- 3. Add the panel to the frame ---
         add(panel);
 
         // --- 4. Add the 'ActionListener' to the button ---
-        // This is what happens when the button is clicked.
         submitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // This is the logic that runs on click.
                 handleSubmit();
             }
         });
     }
 
-    // This method is called when the submit button is clicked
+    // --- STAGE 2 UPDATE ---
+    // handleSubmit method ko update kiya gaya hai
     private void handleSubmit() {
         // Get the text from each text field
         String name = nameField.getText();
@@ -117,25 +121,29 @@ public class RegistrationForm extends JFrame {
         String email = emailField.getText();
         String phone = phoneField.getText();
 
-        // --- Placeholder for next stages ---
-        // For now, just print the data to the console to confirm it works.
-        System.out.println("--- New Student Submission ---");
-        System.out.println("Name: " + name);
-        System.out.println("Student ID: " + studentId);
-        System.out.println("Email: " + email);
-        System.out.println("Phone: " + phone);
-        System.out.println("---------------------------------");
+        // Basic Validation (Stage 3 mein ise behtar karenge)
+        if (name.isEmpty() || studentId.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Name and Student ID are required!", "Error", JOptionPane.ERROR_MESSAGE);
+            return; // Stop the method
+        }
 
-        // In the next stage, we will add validation here.
-        // After validation, we'll create a Student object and send it to the DatabaseManager.
+        // 1. Create a new Student object
+        Student newStudent = new Student(name, studentId, email, phone);
 
-        // We can also add a simple popup to tell the user it worked
-        JOptionPane.showMessageDialog(this, "Data Printed to Console (Not Saved Yet)", "Submission", JOptionPane.INFORMATION_MESSAGE);
+        // 2. Use DatabaseManager to add the student
+        boolean success = dbManager.addStudent(newStudent);
 
-        // Optional: Clear fields after submission
-        nameField.setText("");
-        idField.setText("");
-        emailField.setText("");
-        phoneField.setText("");
+        // 3. Show feedback to the user
+        if (success) {
+            JOptionPane.showMessageDialog(this, "Student registered successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            // Clear fields after successful submission
+            nameField.setText("");
+            idField.setText("");
+            emailField.setText("");
+            phoneField.setText("");
+        } else {
+            // Error message (e.g., duplicate ID)
+            JOptionPane.showMessageDialog(this, "Failed to register student. Student ID might already exist.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
