@@ -31,10 +31,10 @@ Here is a demo of the application in action:
 1. Registration Form
 
 This is the main form presented to the user upon running the application.
-![Student Registration Form](images/form.png)
+![Student Registration Form](image/form.png)
 
 
 2. Saved Database Data
 
 After successfully submitting the data, it is saved to the students.db file. This screenshot shows the data as viewed using "DB Browser for SQLite".
-![Data in SQLite Database](images/database.png)
+![Data in SQLite Database](image/database.png)
